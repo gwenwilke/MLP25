@@ -16,6 +16,7 @@ import numpy as np
 from sklearn.model_selection import cross_val_score, KFold  # For cross-validation
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
 
 ################ Load the data
 diabetes = pd.read_csv('./Data/diabetes.csv')
@@ -32,21 +33,19 @@ mean_score_knn = np.mean(scores)  # calculate mean accuracy across folds
 print(f"Cross-Validation Recognition Rate for k=9: {mean_score_knn * 100:.1f}%")
 
 ################ Cross-Validation of Classification Tree with max_depth=5 on the entire data set
-from sklearn.tree import DecisionTreeClassifier
-tree = DecisionTreeClassifier(max_depth=5, random_state=23)  # Initialize
-scores = cross_val_score(tree, X, y, cv=5, scoring='accuracy')  # 5-fold CV on the entire data set
-mean_score_tree = np.mean(scores)  # calculate mean accuracy across folds
-print(f"Cross-Validation Recognition Rate for Classification Tree with max_depth=5: {mean_score * 100:.1f}%")
+dtree = DecisionTreeClassifier(max_depth=5, random_state=23)  # Initialize
+scores = cross_val_score(dtree, X, y, cv=5, scoring='accuracy')  # 5-fold CV on the entire data set
+mean_score_dtree = np.mean(scores)  # calculate mean accuracy across folds
+print(f"Cross-Validation Recognition Rate for Classification Tree with max_depth=5: {mean_score_dtree * 100:.1f}%")
 
 ################ Compare the two models based on their CV recognition rates
-if mean_score_tree > mean_score_knn:
+if mean_score_dtree > mean_score_knn:
     print("The Classification Tree with max_depth=5 performs better than the 9-NN model.")
 else:
     print("The 9-NN model performs better than the Classification Tree with max_depth=5.")
 
 ################ Train the best model on the entire data set
-best_model = DecisionTreeClassifier(max_depth=5, random_state=23)
-best_model.fit(X, y)
+dtree_model = dtree.fit(X, y)
 print("The best model has been trained on the entire data set.")
 
 # REMEMBER:
@@ -58,7 +57,7 @@ print("The best model has been trained on the entire data set.")
 
 ################ Visualize the best Classification Tree model (just for illustration)
 fig = plt.figure(figsize=(64,48), dpi=100)
-tree.plot_tree(best_model,
+tree.plot_tree(dtree_model,
           feature_names=X.columns,
           class_names=[str(cls) for cls in np.unique(y)],
           rounded=True,
